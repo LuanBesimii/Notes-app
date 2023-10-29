@@ -1,0 +1,30 @@
+.main-structure {
+  display: grid;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+  background: #FFF5F4;
+  height: 100vh;
+}
+.card-structure {
+  display: grid;
+  grid-auto-flow: row;
+  width: 400px;
+  height: 330px;
+  margin-top: 48px;
+}
+.login-input {
+  width: 100%;
+}
+.logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.registration {
+  margin-top: 12px;
+}
+.button-login {
+  background-color: #f3aa2c;
+  color: #fff f;
+}
+

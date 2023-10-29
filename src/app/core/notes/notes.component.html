@@ -1,0 +1,34 @@
+<div class="main">
+  <div class="searchBarContainer">
+    <div class="col-md-5 mx-auto">
+      <div class="input-group">
+        <input #filterInput class="form-control border-end-0 border rounded-pill" type="text" (keyup)="filter($any($event.target).value)" placeholder="Filter">
+        <span class="input-group-append">
+                    <button class="btn btn-outline-secondary bg-white border-bottom-0 border rounded-pill ms-n5" type="button">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+      </div>
+    </div>
+  </div>
+<div class="notes-list" #noteRows  cdkDropList  (cdkDropListDropped)="drop($event)" [@listAnim]>
+<app-note-card class="draggable-element" cdkDrag
+  *ngFor="let note of filteredNotes;"
+  [link]="getNoteID(note)"
+  [@itemAnim]
+  (delete)="deleteNote(note)"
+  (checked)="checkToggle(note)"
+  [title]="note.title"
+  [shortDescription]="note.shortDescription"
+  [description]="note.description"
+
+></app-note-card>
+</div>
+
+
+
+  <button class="btn btn-primary addBtn" routerLink="new">Add Note</button>
+
+</div>
+
+

@@ -1,0 +1,29 @@
+.ms-n5 {
+  margin-left: -40px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  max-width: 550px;
+  margin: 0 auto;
+padding-top: 50px;
+}
+
+.notes-list{
+  border: 1px solid red;
+  margin-top: 25px;
+  margin-bottom: 85px;
+}
+
+app-note-card{
+  display: block;
+  margin-bottom: 20px ;
+}
+.addBtn{
+  position: fixed;
+  bottom: 4px;
+  width: 500px;
+  border-radius: 0;
+  box-shadow: 0 0 15px 5px rgba(233,2,126, 0.2);
+}
