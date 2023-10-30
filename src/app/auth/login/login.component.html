@@ -1,19 +1,19 @@
 <div class="main-structure">
   <mat-card class="card-structure">
     <div class="logo">
-      <img src="assets/atis-logo-header.png" width="80">
+      <img src="assets/atis-logo-header.png" width="150">
     </div>
     <form [formGroup]=form>
-      <mat-form-field class="login-input" appearance="fill">
-        <mat-label>User</mat-label>
-        <input matInput formControlName="userName"  value="">
+      <mat-form-field class="login-input" appearance="fill" >
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="userEmail"    value="">
       </mat-form-field>
       <mat-form-field class="login-input" appearance="fill">
         <mat-label>Password</mat-label>
         <input matInput formControlName="password" type="password" value="">
       </mat-form-field>
     </form>
-    <button mat-raised-button class="button-login" (click)="login()">Login</button>
+    <button mat-raised-button color="primary"  (click)="login()">Login</button>
     <a [routerLink]="['/registration']" class="registration">Not registered? Click here</a>
   </mat-card>
 </div>

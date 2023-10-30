@@ -1,19 +1,23 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {HeaderComponent} from "../header/header.component";
 import {NoteCardComponent} from "../../note-card/note-card.component";
 import {Note} from "../../models/note.model";
 import {NotesService} from "../../services/notes.service";
-import {RouterLink, RouterModule} from "@angular/router";
+import {ActivatedRoute, Router, RouterLink, RouterModule} from "@angular/router";
 import {animate, query, stagger, style, transition, trigger} from "@angular/animations";
-import {CdkDrag, CdkDragDrop, CdkDropList, DragDropModule, transferArrayItem} from "@angular/cdk/drag-drop";
-import {MatDialogModule} from "@angular/material/dialog";
+import {CdkDrag, CdkDragDrop, CdkDropList, DragDropModule, moveItemInArray} from "@angular/cdk/drag-drop";
 import {MatButtonModule} from "@angular/material/button";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {NoteModalComponent} from "../../modals/note-modal/note-modal.component";
+import {MatDialog} from "@angular/material/dialog";
+import {BehaviorSubject} from "rxjs";
+import {OrderNotesPipe} from "../../pipes/order-notes.pipe";
 
 @Component({
   selector: 'app-notes',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, NoteCardComponent, RouterModule, RouterLink, CdkDrag, CdkDropList, DragDropModule,MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent, NoteCardComponent, RouterModule, RouterLink, CdkDrag, CdkDropList, DragDropModule, MatButtonModule, OrderNotesPipe],
   templateUrl: './notes.component.html',
   styleUrls: ['./notes.component.scss'],
   animations: [
@@ -91,30 +95,20 @@ import {MatButtonModule} from "@angular/material/button";
   ]
 })
 export class NotesComponent implements OnInit {
-  notes: Note[] = new Array<Note>();
-  checkedCount: number = 0;
-  uncheckedCount: number = 0;
-  order: number = 1;
-  filteredNotes: Note[] = new Array<Note>();
+  filteredNotes: BehaviorSubject<Note[]> = new BehaviorSubject<Note[]>([]);
 
   @ViewChild('filterInput') filterInputElRef: ElementRef<HTMLInputElement>;
 
-  constructor(private notesService: NotesService) {
+  constructor(private notesService: NotesService, private router: Router, private route: ActivatedRoute, private matDialog: MatDialog, private cdR: ChangeDetectorRef) {
   }
 
   ngOnInit() {
-    this.notes = this.notesService.getAllNotes();
-    // console.log(this.notes, 'notes');
-    this.filteredNotes = this.notesService.getAllNotes();
-    this.filter('');
-    this.updateCheckedCount();
-
+    this.setFilteredNotes(this.notesService.getAllNotes());
   }
 
-  deleteNote(note) {
-    let noteId = this.notesService.getNoteId(note);
-    this.notesService.deleteNote(noteId);
-    this.filter(this.filterInputElRef.nativeElement.value);
+  async deleteNote(note: Note) {
+    await this.notesService.deleteNotePopup(note.id, () => this.refreshData());
+    this.setFilteredNotes(this.notesService.getAllNotes());
   }
 
   filter(query: string) {
@@ -128,13 +122,11 @@ export class NotesComponent implements OnInit {
 
     terms.forEach(term => {
       let results: Note[] = this.relevantNotes(term);
-      //es6 feature array desctructioring
       allResults = [...allResults, ...results];
     });
     //allresults will have duplicate notes
     let uniqueResults = this.removeDuplicates(allResults);
-    this.filteredNotes = uniqueResults;
-    this.sortByRelevancy(allResults);
+    this.filteredNotes.next(uniqueResults);
   }
 
   removeDuplicates(arr: Array<any>): Array<any> {
@@ -146,7 +138,7 @@ export class NotesComponent implements OnInit {
 
   relevantNotes(query: string): Array<Note> {
     query = query.toLowerCase().trim();
-    let relevantNotes = this.notes.filter(note => {
+    let relevantNotes = this.notesService.getAllNotes().filter(note => {
       if (
         note.title && note.title.toLowerCase().includes(query)
       ) {
@@ -167,42 +159,69 @@ export class NotesComponent implements OnInit {
     return relevantNotes;
   }
 
-  sortByRelevancy(searchResult: Note[]) {
-    let noteCountObject: any;
-    searchResult.forEach(note => {
-      let noteId = this.notesService.getNoteId(note)
-      if (noteCountObject[noteId]) {
-        noteCountObject[noteId] += 1;
-      } else {
-        noteCountObject[noteId] = 1
-      }
-    })
-
-    this.filteredNotes = this.filteredNotes.sort((a: Note, b: Note) => {
-      let aId = this.notesService.getNoteId(a);
-      let bId = this.notesService.getNoteId(b);
-      let aCount = noteCountObject[aId];
-      let bCount = noteCountObject[bId];
-      return bCount - aCount;
-    })
-  }
-
-  getNoteID(note: Note): string {
-    let noteId = this.notesService.getNoteId(note).toString();
-    let allUrl = "update/" + noteId;
-    return allUrl;
-  }
-
-  checkToggle(note: Note) {
-
-  }
-
-  private updateCheckedCount() {
-    this.checkedCount = this.notes.filter(note => note.status).length;
-    this.uncheckedCount = this.notes.length - this.checkedCount;
+  checkToggle(note: Note, checked: boolean) {
+    this.notesService.updateStatus(note.id, checked);
   }
 
   drop(event: CdkDragDrop<Note[]>) {
+    let from = this.filteredNotes.value[event.previousIndex];
+    let to = this.filteredNotes.value[event.currentIndex];
+    from.order = event.currentIndex + 1;
+    to.order = event.previousIndex + 1;
+    moveItemInArray(this.filteredNotes.value, event.previousIndex, event.currentIndex);
+    this.notesService.updateOrder(from.id, event.currentIndex + 1);
+    this.notesService.updateOrder(to.id, event.previousIndex + 1);
+  }
 
+  editNote(note: Note) {
+    const ref = this.matDialog.open(NoteModalComponent, {data: {action: 'update', note: note}});
+    ref.afterClosed().subscribe(editedNote => {
+      if (!editedNote) return
+      const index = this.filteredNotes.value.findIndex(n => n.id == editedNote.id);
+      if (index < 0) return;
+      this.filteredNotes.value[index] = editedNote;
+    });
+  }
+
+  openNewNoteModal() {
+    const ref = this.matDialog.open<NoteModalComponent>(NoteModalComponent, {
+      data: {
+        action: 'create',
+        note: new Note()
+      }
+    });
+    ref.afterClosed().subscribe(createdNote => {
+      if (!createdNote) return;
+      this.filteredNotes.value.push(createdNote);
+    });
+  }
+
+  refreshData() {
+    this.setFilteredNotes(this.notesService.getAllNotes());
+    if (this.filterInputElRef.nativeElement.value && this.filterInputElRef.nativeElement.value.trim() != '') {
+      this.filter(this.filterInputElRef.nativeElement.value);
+    }
+  }
+
+  private setFilteredNotes(allNotes: Note[]) {
+    const orderedNotes = this.orderNotes(allNotes);
+    this.filteredNotes.next(orderedNotes);
+  }
+
+  private orderNotes(allNotes: Note[]) {
+    return allNotes.sort((a, b) => {
+      if (a.order > b.order) return 1;
+      if (a.order < b.order) return -1;
+      return 0;
+    });
+  }
+
+  viewNote(note: Note) {
+    this.matDialog.open<NoteModalComponent>(NoteModalComponent, {
+      data: {
+        action: 'view',
+        note: note
+      }
+    })
   }
 }

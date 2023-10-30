@@ -22,7 +22,7 @@ export class AuthService {
   }
 
   userAuthenticate(user: User): void{
-    let storageUser = this.userService.getUserByName(user.name) || undefined
+    let storageUser = this.userService.getUserByEmail(user.email) || undefined
     if(storageUser){
       if(user.password == storageUser.password)
         this.setUserCredentials(storageUser)
@@ -35,14 +35,6 @@ export class AuthService {
     this.isAuthenticated = true
     sessionStorage.setItem('auth', JSON.stringify(user))
   }
-    // get user auth info
-  getUserInformations(): any{
-    let userAuth = sessionStorage.getItem('auth')
-    if(userAuth)
-      return JSON.parse(userAuth)
-    return userAuth
-  }
-
 
   logout(): void{
     this.isAuthenticated = false

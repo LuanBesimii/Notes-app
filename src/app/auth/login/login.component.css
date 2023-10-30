@@ -1,17 +1,18 @@
 .main-structure {
   display: grid;
+  background-color: #7aadff;
   text-align: center;
   justify-content: center;
   width: 100%;
-  background: #FFF5F4;
   height: 100vh;
 }
 .card-structure {
+  padding: 20px;
   display: grid;
   grid-auto-flow: row;
-  width: 400px;
-  height: 330px;
-  margin-top: 48px;
+  width: 700px;
+  height: 400px;
+  margin-top: 20%;
 }
 .login-input {
   width: 100%;
@@ -19,12 +20,10 @@
 .logo {
   text-align: center;
   margin-bottom: 24px;
+  margin-top: 12px;
 }
 .registration {
   margin-top: 12px;
 }
-.button-login {
-  background-color: #f3aa2c;
-  color: #fff f;
-}
+
 

@@ -1,0 +1,19 @@
+
+.mat-dialog-content {
+  /*position: absolute;*/
+  /*margin: auto;*/
+  min-width: 50rem;
+  min-height: 25rem;
+  /*max-height: 55rem;*/
+  width: 50rem;
+  max-height: 50rem;
+  bottom: 30%;
+}
+
+.buttonClose {
+  margin-right: 20px;
+  width: 100px;
+}
+.saveButton{
+  width: 150px;
+}

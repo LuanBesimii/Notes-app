@@ -7,23 +7,22 @@
   flex-direction: column;
   max-width: 550px;
   margin: 0 auto;
-padding-top: 50px;
+  padding-top: 50px;
 }
 
-.notes-list{
-  border: 1px solid red;
+.notes-list {
   margin-top: 25px;
   margin-bottom: 85px;
 }
 
-app-note-card{
+app-note-card {
   display: block;
-  margin-bottom: 20px ;
+  margin-bottom: 20px;
 }
-.addBtn{
+
+.addBtn {
   position: fixed;
   bottom: 4px;
-  width: 500px;
+  width: 550px;
   border-radius: 0;
-  box-shadow: 0 0 15px 5px rgba(233,2,126, 0.2);
 }

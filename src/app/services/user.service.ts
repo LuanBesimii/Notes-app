@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {User} from "../models/user.model";
+import Swal from "sweetalert2";
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +16,24 @@ export class UserService {
   }
   private setUserToLocalStorage(user: User): void{
     let users = this.getUsers()
-    if(users == null)
+    if(users == null) {
       localStorage.setItem('users', JSON.stringify([user]))
+      Swal.fire({
+        title: 'User Created',
+        icon: 'success',
+        confirmButtonColor: '#0BDA51',
+        allowOutsideClick: true
+      });
+    }
     else{
       users = this.addUserOnList(user, users)
-      localStorage.setItem('users', JSON.stringify(users))
+      localStorage.setItem('users', JSON.stringify(users));
+      Swal.fire({
+        title: 'User Created',
+        icon: 'success',
+        confirmButtonColor: '#0BDA51',
+        allowOutsideClick: true
+      });
     }
   }
 
@@ -32,10 +46,10 @@ export class UserService {
   }
 
 
-  getUserByName(name: string): User | undefined{
+  getUserByEmail(email: string): User | undefined{
     let list = this.getUsers()
     if(list !== null){
-      let userFound = list.find(user => user.name == name)
+      let userFound = list.find(user => user.email == email)
       return userFound
     }
     return undefined

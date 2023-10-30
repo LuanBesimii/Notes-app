@@ -1,0 +1,28 @@
+
+<div mat-dialog-title class="d-flex justify-content-between mt-2">
+  <h1 class="modal-title fs-5" id="exampleModalLabel">{{modalTitle}}</h1>
+  <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+</div>
+<div mat-dialog-content class="mat-dialog-content">
+  <!-- Modal -->
+      <form #noteForm="ngForm" (ngSubmit)="onSubmit(noteForm)">
+        <div class="modal-body">
+          <div class="mb-3 mt-5 ">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" [disabled]="data.action === 'view'" [(ngModel)]="data.note.title"  required >
+          </div>
+          <div class="mb-3 ">
+            <label for="shortDescription" class="form-label">Short Description</label>
+            <input type="text" class="form-control" id="shortDescription" name="shortDescription" [disabled]="data.action === 'view'" [(ngModel)]="data.note.shortDescription"    required>
+          </div>
+          <div class="mb-3 ">
+            <label for="descripion" class="form-label">Description</label>
+            <textarea class="form-control " id="descripion" rows="3" name="description" [disabled]="data.action === 'view'" [(ngModel)]="data.note.description"   required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger buttonClose " (click)="closeDialog()">Close</button>
+          <button type="submit" class="btn btn-success saveButton" *ngIf="data.action !== 'view'">Save</button>
+        </div>
+      </form>
+</div>

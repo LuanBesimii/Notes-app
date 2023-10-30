@@ -7,16 +7,19 @@ import {MatButtonModule} from "@angular/material/button";
 import {Router, RouterLink, RouterModule} from "@angular/router";
 import {AuthService} from "../../services/auth.service";
 import {User} from "../../models/user.model";
+import {MatIconModule} from "@angular/material/icon";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, FormsModule, ReactiveFormsModule, MatButtonModule, MatCardModule, MatInputModule],
+  imports: [CommonModule, RouterModule, RouterLink, FormsModule, ReactiveFormsModule, MatButtonModule, MatCardModule, MatInputModule, MatIconModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
   public form!: FormGroup
+
   constructor(
     private router: Router,
     private fb: FormBuilder,
@@ -30,34 +33,42 @@ export class LoginComponent implements OnInit {
   }
 
   loginAttemptsListen() {
-    this.authService.loginTryEvent.subscribe(event =>{
-      if(event)
-     alert("'Sorry, try again', 'Wrong credentials'")
+    this.authService.loginTryEvent.subscribe(event => {
+      if (event)
+        Swal.fire({
+          title: 'Login Unsuccessful',
+          text: "Email or Password is wrong",
+          icon: 'error',
+          confirmButtonColor: '#d33',
+          allowOutsideClick: true
+        });
     })
   }
 
   private formInit() {
     this.form = this.fb.group({
-      userName: ['', Validators.required],
+      userEmail: ['', Validators.required],
       password: ['', Validators.required]
     })
   }
 
-  login() {
+   login() {
     let user: User = this.getFormValue()
-    if (user && user.name && user.password) {
+    if (user && user.email && user.password) {
       this.authService.userAuthenticate(user)
       this.router.navigate(['/note'])
-    } else
-      alert("'Sorry, try again', 'Wrong credentials'");
+    }
+
   }
 
   private getFormValue(): User {
     let user: User = {
       id: 0,
-      name: this.form.controls['userName'].value,
+      email: this.form.controls['userEmail'].value,
       password: this.form.controls['password'].value
     }
     return user
   }
+
+
 }

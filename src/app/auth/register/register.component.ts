@@ -6,11 +6,13 @@ import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} fr
 import {UserService} from "../../services/user.service";
 import {Router} from "@angular/router";
 import {User} from "../../models/user.model";
+import {MatInputModule} from "@angular/material/input";
+import {MatButtonModule} from "@angular/material/button";
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, FormsModule],
+  imports: [CommonModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, FormsModule, MatInputModule,MatButtonModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -49,7 +51,7 @@ export class RegisterComponent  implements OnInit{
 
   private formInit(){
     this.form = this.fb.group({
-      userName: ['', Validators.required],
+      userEmail: ['', Validators.required],
       password: ['', Validators.required],
       passwordConfirmation: ['', Validators.required]
     })
@@ -59,13 +61,13 @@ export class RegisterComponent  implements OnInit{
   private getFormValue(): User{
     let user: User = {
       id: 0,
-      name: this.form.controls['userName'].value,
+      email: this.form.controls['userEmail'].value,
       password: this.form.controls['password'].value
     }
     return user
   }
    formClear(){
-    this.form.controls['userName'].patchValue('')
+    this.form.controls['userEmail'].patchValue('')
     this.form.controls['password'].patchValue('')
     this.form.controls['passwordConfirmation'].patchValue('')
   }
@@ -75,5 +77,10 @@ export class RegisterComponent  implements OnInit{
     this.userService.saveUser(user)
     this.formClear()
     this.router.navigate(['/login'])
+  }
+
+  goBack(){
+    this.formClear();
+    this.router.navigate(['/login']);
   }
 }

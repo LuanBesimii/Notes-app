@@ -1,9 +1,9 @@
-<div #container class="note-card-container">
-  <div class=" card note-card-content" [routerLink]="link">
-    <h6 class=" card-title note-card-title">{{title}}</h6>
-    <div #bodyText class="card-body note-card-body">
-      <p class="m-0"><span class="p-weight">Short: </span>{{shortDescription}}</p>
-      <p class="m-0"><span class="p-weight">Description: </span>{{description}}</p>
+<div class="note-card-container">
+  <div class=" card note-card-content" >
+    <h6 class=" card-title note-card-title">{{note.title}}</h6>
+    <div #bodyText class="card-body note-card-body" (click)="viewNote()">
+      <p class="m-0 padding-right"><span class="p-weight">Short: </span>{{note.shortDescription}}</p>
+      <p class="m-0 padding-right "><span class="p-weight">Description: </span>{{note.description}}</p>
       <div  #truncator class="fade-out-truncation"></div>
     </div>
   </div>
@@ -11,8 +11,11 @@
   <div class="x-button" (click)="deleteNote()">
 
   </div>
+    <div class="editBtn" (click)="editNote()">
+      <i class="fa fa-edit"></i>
+    </div>
     <div class="checkbox">
-      <input type="checkbox"  (change)="updateChecked()">
+      <input type="checkbox" [checked]="note.status" (change)="updateChecked($event)">
     </div>
   </div>
 </div>
